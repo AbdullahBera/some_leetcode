@@ -147,3 +147,66 @@ SELECT
 FROM actual_forecasted
 WHERE forecasted IS NOT NULL 
 
+
+--- Question 5 (Microsoft)
+
+"""
+Given a list of projects and employees mapped to each project, calculate by the amount of project budget allocated to each employee. The output should include the project 
+title and the project budget rounded to the closest integer. Order your list by projects with the highest budget per employee first.
+
+
+𝐒𝐜𝐡𝐞𝐦𝐚 𝐚𝐧𝐝 𝐃𝐚𝐭𝐚𝐬𝐞𝐭:
+CREATE TABLE ms_projects(id int, title varchar(15), budget int);
+INSERT INTO ms_projects VALUES (1, 'Project1',  29498),(2, 'Project2',  32487),(3, 'Project3',  43909),(4, 'Project4',  15776),(5, 'Project5',  36268),(6, 'Project6',  
+41611),(7, 'Project7',  34003),(8, 'Project8',  49284),(9, 'Project9',  32341),(10, 'Project10',    47587),(11, 'Project11',    11705),(12, 'Project12',    10468),(13, 
+'Project13',    43238),(14, 'Project14',    30014),(15, 'Project15',    48116),(16, 'Project16',    19922),(17, 'Project17',    19061),(18, 'Project18',    10302),(19, 
+'Project19',    44986),(20, 'Project20',    19497);
+
+CREATE TABLE ms_emp_projects(emp_id int, project_id int);
+INSERT INTO ms_emp_projects VALUES (10592,  1),(10593,  2),(10594,  3),(10595,  4),(10596,  5),(10597,  6),(10598,  7),(10599,  8),(10600,  9),(10601,  10),(10602, 11),
+(10603, 12),(10604, 13),(10605, 14),(10606, 15),(10607, 16),(10608, 17),(10609, 18),(10610, 19),(10611, 20);
+
+"""
+
+SELECT p.title AS project_title,
+		(p.budget / COUNT(e.emp_id)) AS budget_per_employee
+FROM ms_projects AS p 
+LEFT JOIN ms_emp_projects AS e ON p.id = e.project_id 
+GROUP BY p.title, p.budget
+ORDER BY 2 DESC
+
+
+--- Question 6 (Airbnb)
+
+"""
+Find the total number of available beds per hosts' nationality.
+Output the nationality along with the corresponding total number of available beds. Sort records by the total available beds in descending order.
+
+🔍 It's straightforward, read the question carefully and give it a try! 👇
+
+𝐒𝐜𝐡𝐞𝐦𝐚 𝐚𝐧𝐝 𝐃𝐚𝐭𝐚𝐬𝐞𝐭:
+CREATE TABLE airbnb_apartments(host_id int,apartment_id varchar(5),apartment_type varchar(10),n_beds int,n_bedrooms int,country varchar(20),city varchar(20));
+INSERT INTO airbnb_apartments VALUES(0,'A1','Room',1,1,'USA','NewYork'),(0,'A2','Room',1,1,'USA','NewJersey'),(0,'A3','Room',1,1,'USA','NewJersey'),(1,'A4','Apartment',
+2,1,'USA','Houston'),(1,'A5','Apartment',2,1,'USA','LasVegas'),(3,'A7','Penthouse',3,3,'China','Tianjin'),(3,'A8','Penthouse',5,5,'China','Beijing'),(4,'A9','Apartment',
+2,1,'Mali','Bamako'),(5,'A10','Room',3,1,'Mali','Segou')
+
+CREATE TABLE airbnb_hosts(host_id int,nationality  varchar(15),gender varchar(5),age int);
+INSERT INTO airbnb_hosts  VALUES(0,'USA','M',28),(1,'USA','F',29),(2,'China','F',31),(3,'China','M',24),(4,'Mali','M',30),(5,'Mali','F',30);
+
+"""
+
+
+SELECT h.nationality,
+		SUM(a.n_beds)
+FROM airbnb_apartments AS a
+LEFT JOIN airbnb_hosts AS h ON a.host_id = h.host_id
+GROUP BY h.nationality
+ORDER BY 2 DESC
+
+SELECT h.nationality,
+		SUM(a.n_beds)
+FROM  airbnb_hosts AS h
+LEFT JOIN airbnb_apartments AS a ON a.host_id = h.host_id
+GROUP BY h.nationality
+ORDER BY 2 DESC
+
