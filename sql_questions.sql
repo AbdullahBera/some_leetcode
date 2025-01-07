@@ -210,3 +210,70 @@ LEFT JOIN airbnb_apartments AS a ON a.host_id = h.host_id
 GROUP BY h.nationality
 ORDER BY 2 DESC
 
+-- Question 7 (IBM)
+
+
+"""
+
+IBM is working on a new feature to analyze user purchasing behavior for all Fridays in the first quarter of the year. For each Friday separately, calculate the average 
+amount users have spent per order. The output should contain the week number of that Friday and average amount spent.
+
+🔍 By solving this, you'll learn how to handle date and time by the end of the day. Give it a try! 👇
+
+𝐒𝐜𝐡𝐞𝐦𝐚 𝐚𝐧𝐝 𝐃𝐚𝐭𝐚𝐬𝐞𝐭:
+CREATE TABLE user_purchases(user_id int, date date, amount_spent float, day_name varchar(15));
+
+INSERT INTO user_purchases VALUES(1047,'2023-01-01',288,'Sunday'),(1099,'2023-01-04',803,'Wednesday'),(1055,'2023-01-07',546,'Saturday'),(1040,'2023-01-10',680,'Tuesday'),
+(1052,'2023-01-13',889,'Friday'),(1052,'2023-01-13',596,'Friday'),(1016,'2023-01-16',960,'Monday'),(1023,'2023-01-17',861,'Tuesday'),(1010,'2023-01-19',758,'Thursday'),
+(1013,'2023-01-19',346,'Thursday'),(1069,'2023-01-21',541,'Saturday'),(1030,'2023-01-22',175,'Sunday'),(1034,'2023-01-23',707,'Monday'),(1019,'2023-01-25',253,'Wednesday'),
+(1052,'2023-01-25',868,'Wednesday'),(1095,'2023-01-27',424,'Friday'),(1017,'2023-01-28',755,'Saturday'),(1010,'2023-01-29',615,'Sunday'),(1063,'2023-01-31',534,'Tuesday'),
+(1019,'2023-02-03',185,'Friday'),(1019,'2023-02-03',995,'Friday'),(1092,'2023-02-06',796,'Monday'),(1058,'2023-02-09',384,'Thursday'),(1055,'2023-02-12',319,'Sunday'),(1090,
+'2023-02-15',168,'Wednesday'),(1090,'2023-02-18',146,'Saturday'),(1062,'2023-02-21',193,'Tuesday'),(1023,'2023-02-24',259,'Friday');
+-------------
+"""
+
+WITH total_amount_spent AS(
+SELECT user_id,
+		date,
+		amount_spent,
+		DATE_PART('week', date) as week_number,
+		day_name
+FROM user_purchases
+WHERE day_name = 'Friday' AND 
+		DATE_PART('month', date) IN (1,2,3)
+)
+SELECT week_number,
+		AVG(amount_spent)
+FROM total_amount_spent
+GROUP BY 1;
+
+-- Question 8 (Tesla)
+
+"""
+
+You are given a table of product launches by company by year. Write a query to count the net difference between the number of products companies launched in 2020 with the 
+number of products companies launched in the previous year. Output the name of the companies and a net difference of net products released for 2020 compared to the previous 
+year.
+
+🔍 By solving this, you'll learn how to handle aggregation function. Give it a try! 👇
+
+𝐒𝐜𝐡𝐞𝐦𝐚 𝐚𝐧𝐝 𝐃𝐚𝐭𝐚𝐬𝐞𝐭:
+CREATE TABLE car_launches(year int, company_name varchar(15), product_name varchar(30));
+
+INSERT INTO car_launches VALUES(2019,'Toyota','Avalon'),(2019,'Toyota','Camry'),(2020,'Toyota','Corolla'),(2019,'Honda','Accord'),(2019,'Honda','Passport'),(2019,'Honda',
+'CR-V'),(2020,'Honda','Pilot'),(2019,'Honda','Civic'),(2020,'Chevrolet','Trailblazer'),(2020,'Chevrolet','Trax'),(2019,'Chevrolet','Traverse'),(2020,'Chevrolet','Blazer'),
+(2019,'Ford','Figo'),(2020,'Ford','Aspire'),(2019,'Ford','Endeavour'),(2020,'Jeep','Wrangler')
+"""
+
+WITH total_launches AS(
+	SELECT company_name,
+			SUM(CASE WHEN year = 2019 THEN 1 ELSE 0 END) AS product_2019,
+			SUM(CASE WHEN year = 2020 THEN 1 ELSE 0 END) AS product_2020 
+	FROM car_launches
+	WHERE year IN (2019, 2020)
+	GROUP BY company_name
+)
+SELECT company_name,
+		(product_2020 - product_2019) AS net_difference
+FROM total_launches
+ORDER BY net_difference DESC;
