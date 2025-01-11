@@ -383,3 +383,32 @@ JOIN excel_sql_transaction_data AS t
 	ON t.product_id = i.product_id
 GROUP BY i.product_name, i.product_id
 ORDER BY i.product_id 
+
+
+-- Question 12 (Dropbox)
+
+"""
+Write a query that calculates the difference between the highest salaries found in the marketing and engineering departments. Output just the absolute difference in 
+salaries.
+
+🔍 By solving this, you'll learn how to use case and join. Give it a try later and share the output! 👇
+
+𝐒𝐜𝐡𝐞𝐦𝐚 𝐚𝐧𝐝 𝐃𝐚𝐭𝐚𝐬𝐞𝐭:
+CREATE TABLE db_employee (id INT,first_name VARCHAR(50),last_name VARCHAR(50),salary INT,department_id INT);
+
+INSERT INTO db_employee (id, first_name, last_name, salary, department_id) VALUES(10306, 'Ashley', 'Li', 28516, 4),(10307, 'Joseph', 'Solomon', 19945, 1),(10311, 
+'Melissa', 'Holmes', 33575, 1),(10316, 'Beth', 'Torres', 34902, 1),(10317, 'Pamela', 'Rodriguez', 48187, 4),(10320, 'Gregory', 'Cook', 22681, 4),(10324, 'William', 
+'Brewer', 15947, 1),(10329, 'Christopher', 'Ramos', 37710, 4),(10333, 'Jennifer', 'Blankenship', 13433, 4),(10339, 'Robert', 'Mills', 13188, 1);
+
+CREATE TABLE db_dept (id INT,department VARCHAR(50));
+
+"""
+
+
+SELECT  ABS(
+		MAX(CASE WHEN d.id = 1 THEN e.salary END) -
+		MAX(CASE WHEN d.id = 4 THEN e.salary END)
+		) AS difference 
+FROM db_employee AS e
+LEFT JOIN db_dept AS d 
+	ON d.id = e.department_id
