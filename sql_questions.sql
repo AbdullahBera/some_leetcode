@@ -670,3 +670,122 @@ SELECT TO_CHAR(time_id, 'YYYY-MM') AS month_stamp,
 		client_id
 FROM fact_events
 GROUP BY client_id, TO_CHAR(time_id, 'YYYY-MM')
+
+
+
+-- Question 1 
+'''
+Return the count of employees by gender. Return the gender value and the count of employees
+'''
+
+SELECT gender,
+		COUNT(gender) AS gender_count
+FROM employees
+GROUP BY gender;
+
+-- Question 2 
+'''
+Return the first_name and last_name of the employees who have had more than 1 title. Return 
+the first_name, last_name and the count of the titles they have.
+'''
+
+SELECT e.first_name,
+		e.last_name,
+        COUNT(t.emp_no) AS titles_count
+FROM titles AS t
+LEFT JOIN employees AS e
+		ON e.emp_no = t.emp_no
+GROUP BY t.emp_no
+HAVING COUNT(t.emp_no) > 1;
+
+-- Question 3 
+'''
+All-time highest earning employee. This is the employee whose salary is highest. Return the 
+first_name, last_name, salary and the department in which the employee works.
+'''
+
+WITH max_salary AS (
+	SELECT e.first_name,
+			e.last_name,
+            e.emp_no,
+            s.salary
+	FROM employees AS e 
+    LEFT JOIN salaries AS s
+			ON s.emp_no = e.emp_no
+	WHERE s.salary = (SELECT MAX(salary) FROM salaries)
+), 
+employee_departments AS(
+	SELECT de.emp_no,
+			d.dept_name
+	FROM dept_emp AS de 
+    LEFT JOIN departments AS d 
+			ON d.dept_no = de.dept_no
+)
+SELECT m.first_name,
+		m.last_name,
+        m.salary,
+		em.dept_name
+FROM max_salary AS m
+LEFT JOIN employee_departments AS em
+		ON em.emp_no = m.emp_no;
+
+
+-- Question 4 
+'''
+Find all the employees who have never been a department manager. Return the first_name and 
+the last_name.
+'''
+
+SELECT first_name,
+		last_name 
+FROM employees AS e 
+WHERE emp_no NOT IN (SELECT emp_no FROM dept_manager);
+
+-- Question 5 
+'''
+Return the sum of departmental salaries by year group by department and ascending order of 
+year. Return should have department name, year and the total salary. For the year calculations, 
+consider the to_date.
+'''
+
+WITH empolyee_department AS(
+	SELECT s.emp_no, 
+			s.salary,
+			s.to_date,
+			de.dept_no
+	FROM salaries AS s
+	LEFT JOIN dept_emp AS de
+			ON de.emp_no = s.emp_no
+), department_names_employees AS(
+	SELECT de.emp_no,
+			de.dept_no,
+			dep.dept_name
+	FROM dept_emp AS de
+    LEFT JOIN departments AS dep
+			ON dep.dept_no = de.dept_no
+)	SELECT SUM(ed.salary) AS total_salary,
+			DATE_FORMAT(ed.to_date, '%Y') AS year,
+			dne.dept_name
+	FROM empolyee_department AS ed
+    LEFT JOIN department_names_employees AS dne
+			ON dne.emp_no = ed.emp_no
+	GROUP BY 2, 3
+    ORDER BY 2 ASC;
+
+
+-- Question 6 
+'''
+Which job title has the highest salary? Return the job title and the salary.
+'''
+
+WITH max_salaries AS(
+	SELECT emp_no, 
+			salary AS max_salary
+	FROM salaries
+	WHERE salary = (SELECT MAX(salary) FROM salaries)
+)
+SELECT ms.max_salary,
+		t.title
+FROM max_salaries AS ms
+LEFT JOIN titles AS t
+		ON t.emp_no = ms.emp_no;
