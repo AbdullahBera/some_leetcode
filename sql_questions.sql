@@ -789,3 +789,48 @@ SELECT ms.max_salary,
 FROM max_salaries AS ms
 LEFT JOIN titles AS t
 		ON t.emp_no = ms.emp_no;
+
+
+
+-- Question 21 (Microsoft)
+
+"""
+𝐌𝐮𝐬𝐭 𝐓𝐫𝐲: Microsoft (Hard Level) hashtag#SQL Interview Question — Solution
+
+Find the total number of downloads for paying and non-paying users by date. Include only records where non-paying customers have more downloads than paying customers. 
+The output should be sorted by earliest date first and contain 3 columns date, non-paying downloads, paying downloads. 
+
+Note: In Oracle you should use "date" when referring to date column (reserved keyword).
+
+🔍By solving this, you'll learn how to use join, groupby and having. Give it a try and share the output!👇
+
+𝐒𝐜𝐡𝐞𝐦𝐚 𝐚𝐧𝐝 𝐃𝐚𝐭𝐚𝐬𝐞𝐭:
+CREATE TABLE ms_user_dimension (user_id INT PRIMARY KEY,acc_id INT);
+INSERT INTO ms_user_dimension (user_id, acc_id) VALUES (1, 101),(2, 102),(3, 103),(4, 104),(5, 105);
+
+CREATE TABLE ms_acc_dimension (acc_id INT PRIMARY KEY,paying_customer VARCHAR(10));
+INSERT INTO ms_acc_dimension (acc_id, paying_customer) VALUES (101, 'Yes'),(102, 'No'),(103, 'Yes'),(104, 'No'),(105, 'No');
+
+CREATE TABLE ms_download_facts (date DATETIME,user_id INT,downloads INT);
+INSERT INTO ms_download_facts (date, user_id, downloads) VALUES ('2024-10-01', 1, 10),('2024-10-01', 2, 15),('2024-10-02', 1, 8),('2024-10-02', 3, 12),('2024-10-02', 4, 20)
+,('2024-10-03', 2, 25),('2024-10-03', 5, 18);
+-----------
+"""
+
+WITH payment_for_customers AS(
+	SELECT ud.user_id, 
+			ad.paying_customer 
+	FROM ms_user_dimension AS ud 
+	LEFT JOIN ms_acc_dimension AS ad 
+			ON ad.acc_id = ud.acc_id
+)
+SELECT df.date,
+		SUM(CASE WHEN pc.paying_customer = 'Yes' THEN df.downloads ELSE 0 END) AS paying_customer,
+		SUM(CASE WHEN pc.paying_customer = 'No' THEN df.downloads ELSE 0 END) AS not_paying_customer
+FROM payment_for_customers AS pc
+LEFT JOIN ms_download_facts AS df
+		ON pc.user_id = df.user_id 
+GROUP BY 1
+HAVING SUM(CASE WHEN pc.paying_customer = 'No' THEN df.downloads ELSE 0 END) > 
+ 		SUM(CASE WHEN pc.paying_customer = 'Yes' THEN df.downloads ELSE 0 END)
+ORDER BY 1 ASC
