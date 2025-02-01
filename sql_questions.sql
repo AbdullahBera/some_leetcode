@@ -748,29 +748,33 @@ year. Return should have department name, year and the total salary. For the yea
 consider the to_date.
 '''
 
-WITH empolyee_department AS(
-	SELECT s.emp_no, 
-			s.salary,
-			s.to_date,
-			de.dept_no
-	FROM salaries AS s
-	LEFT JOIN dept_emp AS de
-			ON de.emp_no = s.emp_no
-), department_names_employees AS(
-	SELECT de.emp_no,
-			de.dept_no,
-			dep.dept_name
-	FROM dept_emp AS de
+WITH employee_department AS (
+    SELECT s.emp_no, 
+           s.salary,
+           s.to_date,
+           de.dept_no
+    FROM salaries AS s
+    LEFT JOIN dept_emp AS de
+        ON de.emp_no = s.emp_no
+), department_names_employees AS (
+    SELECT de.emp_no,
+           de.dept_no,
+           dep.dept_name
+    FROM dept_emp AS de
     LEFT JOIN departments AS dep
-			ON dep.dept_no = de.dept_no
-)	SELECT SUM(ed.salary) AS total_salary,
-			DATE_FORMAT(ed.to_date, '%Y') AS year,
-			dne.dept_name
-	FROM empolyee_department AS ed
-    LEFT JOIN department_names_employees AS dne
-			ON dne.emp_no = ed.emp_no
-	GROUP BY 2, 3
-    ORDER BY 2 ASC;
+        ON dep.dept_no = de.dept_no
+) 
+SELECT 
+    dne.dept_name,
+    DATE_FORMAT(ed.to_date, '%Y') AS year,
+    SUM(ed.salary) AS total_salary
+FROM employee_department AS ed
+LEFT JOIN department_names_employees AS dne
+    ON dne.emp_no = ed.emp_no
+    AND dne.dept_no = ed.dept_no 
+GROUP BY 1, 2
+ORDER BY 2 ASC;
+
 
 
 -- Question 6 
@@ -788,7 +792,8 @@ SELECT ms.max_salary,
 		t.title
 FROM max_salaries AS ms
 LEFT JOIN titles AS t
-		ON t.emp_no = ms.emp_no;
+		ON t.emp_no = ms.emp_no
+LIMIT 1; 
 
 
 
