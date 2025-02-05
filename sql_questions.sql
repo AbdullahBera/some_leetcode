@@ -729,7 +729,6 @@ FROM max_salary AS m
 LEFT JOIN employee_departments AS em
 		ON em.emp_no = m.emp_no;
 
-
 -- Question 4 
 '''
 Find all the employees who have never been a department manager. Return the first_name and 
@@ -775,8 +774,6 @@ LEFT JOIN department_names_employees AS dne
 GROUP BY 1, 2
 ORDER BY 2 ASC;
 
-
-
 -- Question 6 
 '''
 Which job title has the highest salary? Return the job title and the salary.
@@ -794,8 +791,6 @@ FROM max_salaries AS ms
 LEFT JOIN titles AS t
 		ON t.emp_no = ms.emp_no
 LIMIT 1; 
-
-
 
 -- Question 21 (Microsoft)
 
@@ -839,8 +834,6 @@ GROUP BY 1
 HAVING SUM(CASE WHEN pc.paying_customer = 'No' THEN df.downloads ELSE 0 END) > 
  		SUM(CASE WHEN pc.paying_customer = 'Yes' THEN df.downloads ELSE 0 END)
 ORDER BY 1 ASC
-
-
 
 -- Question 22 (Walmart)
 
