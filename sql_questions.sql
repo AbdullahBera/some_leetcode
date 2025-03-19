@@ -1024,4 +1024,3 @@ WITH lead_employer AS(
 	SELECT user_id
 	FROM lead_employer
 	WHERE employer = 'Microsoft' AND next_employer = 'Google'
-	
